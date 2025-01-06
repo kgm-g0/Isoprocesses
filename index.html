@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/main.css">
+  <script src="scripts/main.js"></script>
+  <title>Циклопроцессы v0.1</title>
+</head>
+<body>
+    <h1 id="header">Циклопроцессы [0.1]</h1>
+    <p id="step1Elem" style="margin-top: 5px;">
+        <label for="typeOfGraphic">
+            Какой дан график?
+        </label>
+        <select id="typeOfGraphic"
+            onchange="step1(this)">
+            <option value="0"
+                selected disabled>
+                -
+            </option>
+            <option value="1">
+                p(V)
+            </option>
+            <option value="2">
+                p(T)
+            </option>
+            <option value="3">
+                V(T)
+            </option>
+        </select>
+    </p>
+    
+    <p id="step2Elem" style="display: none;">
+        <label for="numOfPoints">
+            Сколько точек на графике?
+        </label>
+        <select id="numOfPoints"
+            onchange="step2(this)">
+            <option value="0"
+                selected disabled>
+                -
+            </option>
+            <!-- <option value="1">
+                1
+            </option> -->
+            <option value="2">
+                2
+            </option>
+            <option value="3">
+                3
+            </option>
+            <option value="4">
+                4
+            </option>
+        </select>
+    </p>
+    
+    <div id="step3Elem" style="display: none;">
+        <p>Какие координаты у этих точек?</p>
+        <ul>
+        <li id="1Point">
+            <b>1 Точка:</b>
+            <table id="1PointTable">
+                <tr>
+                    <td>
+                        <label for="1Label1Point" id="1Label1PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="1Label1Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="2Label1Point" id="2Label1PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="2Label1Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+            </table>
+        </li>
+        
+        <li id="2Point">
+            <b>2 Точка:</b>
+            <table id="2PointTable">
+                <tr>
+                    <td>
+                        <label for="1Label2Point" id="1Label2PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="1Label2Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="2Label2Point" id="2Label2PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="2Label2Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+            </table>
+        </li>
+        
+        <li id="3Point">
+            <b>3 Точка:</b>
+            <table id="3PointTable">
+                <tr>
+                    <td>
+                        <label for="1Label3Point" id="1Label3PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="1Label3Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="2Label3Point" id="2Label3PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="2Label3Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+            </table>
+        </li>
+        
+        <li id="4Point">
+            <b>4 Точка:</b>
+            <table id="4PointTable">
+                <tr>
+                    <td>
+                        <label for="1Label4Point" id="1Label4PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="1Label4Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="2Label4Point" id="2Label4PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="2Label4Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+            </table>
+        </li>
+        </ul>
+        
+        <button onclick="submit()">
+            Посчитать
+        </button>
+    </div>
+    
+    <div id="resultWindow" style="display: none;">
+        <h3 style="padding: 5px">Результат:</h3>
+        <div id="result" style="padding: 5px;"></div>
+        <canvas id="cvs-pV" width="300" height="300"></canvas>
+        <canvas id="cvs-pT" width="300" height="300"></canvas>
+        <canvas id="cvs-VT" width="300" height="300"></canvas>
+        <!-- <table id="resultTable">
+            <tr>
+                <td>Переход, состояние</td>
+                <td>p, Па</td>
+                <td>V, м<sup>3</sup></td>
+                <td>T, К</td>
+                <td>Процесс</td>
+            </tr>
+            <tr>
+                <td>Точка 1</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Переход 1-2</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>Никакой<br>pV ~ T</td>
+            </tr>
+            <tr>
+                <td>Точка 2</td>
+                <td>7</td>
+                <td>8</td>
+                <td>9</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Переход 2-3</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>Lorem Ipsum</td>
+            </tr>
+            
+        </table> -->
+    </div>
+    <br>
+    
+	<footer>&copy; KGM, 2025</footer>
+</body>
+</html>
