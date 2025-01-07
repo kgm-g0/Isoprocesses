@@ -1,2 +1,2 @@
-# isoprocesses-project
+# Isoprocesses-Project
 Изопроцессы [Проект по физике]
