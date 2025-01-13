@@ -1,9 +1,13 @@
 body {
     background: lightblue;
-    font-family: "Arial Sans-Serif";
+    font-family: "Arial", "Verdana", "Sans-Serif";
     min-height: calc(100vh - 5px);
     margin: 0 5px;
-    overflow: none;
+    overflow: auto;
+}
+
+button:hover, select:hover {
+    cursor: pointer;
 }
 
 #header {
