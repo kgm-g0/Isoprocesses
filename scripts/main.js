@@ -1,30 +1,68 @@
+const safeArea = 240; // => 240x240
+
 const R = 8.31;
 var nu = 1 / 8.31;
 
 var typeOfGraphic = 0;
 var numOfPoints = 0;
 var oldTable = false;
+var isIsoprocess = true;
 
 var points = {
     1: {
-        p: 1,
-        V: 1,
-        T: 1,
+        p: 0,
+        V: 0,
+        T: 0,
+    },
+    .1: {
+        use: 0,
+        dU: 0,
+        A: 0,
+        Q: 0,
     },
     2: {
-        p: 1,
-        V: 1,
-        T: 1,
+        p: 0,
+        V: 0,
+        T: 0,
+    },
+    .2: {
+        use: 0,
+        dU: 0,
+        A: 0,
+        Q: 0,
     },
     3: {
-        p: 1,
-        V: 1,
-        T: 1,
+        p: 0,
+        V: 0,
+        T: 0,
+    },
+    .3: {
+        use: 0,
+        dU: 0,
+        A: 0,
+        Q: 0,
     },
     4: {
-        p: 1,
-        V: 1,
-        T: 1,
+        p: 0,
+        V: 0,
+        T: 0,
+    },
+    .4: {
+        use: 0,
+        dU: 0,
+        A: 0,
+        Q: 0,
+    },
+    5: {
+        p: 0,
+        V: 0,
+        T: 0,
+    },
+    .5: {
+        use: 0,
+        dU: 0,
+        A: 0,
+        Q: 0,
     }, //...
 };
 
@@ -46,7 +84,7 @@ function step2(el) {
     document.getElementById("step3Elem").style.display = "block";
     document.getElementById("resultWindow").style.display = "none";
     
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {
         document.getElementById(`${i}Point`).style.display = "none";
         document.getElementById(`${i}PointTable`).style.borderBottom = "1px solid black";
     }
@@ -96,19 +134,31 @@ function submit() {
                 points[i].V = V_ != "" ? +V_ : 1;
                 points[i].p = nu * R * points[i].T / points[i].V;
             }
-            
+
             break;
     }
     
     let arrValues = [];
-    for (let i = 1; i <= numOfPoints; i++)
+
+    let pMax = points[1].p;
+    let VMax = points[1].V;
+    let TMax = points[1].T;
+
+    for (let i = 1; i <= numOfPoints; i++) {
         arrValues.push(points[i]);
+
+        if (i == 1) continue;
+
+        pMax = Math.max(pMax, points[i].p);
+        VMax = Math.max(VMax, points[i].V);
+        TMax = Math.max(TMax, points[i].T);
+    }
     
-    createResultTable(arrValues);
-    plotGraphics();
+    createResultTable(arrValues, { p: pMax, V: VMax, T:TMax });
+    // plotGraphics(pMax, VMax, TMax);
 }
 
-function createResultTable(values) {
+function createResultTable(values, maxValues) {
     const table = document.createElement("table");
     table.style.textAlign = "center";
     let rows = [];
@@ -137,7 +187,7 @@ function createResultTable(values) {
             cell.innerHTML = `Точка ${(i+1)/2}`;
             cells_.push(cell);
             
-            //console.log(i, (i+1)/2-1, values[(i+1)/2-1]);
+            console.log((i+1)/2-1, values[(i+1)/2-1]);
             
             for (j in values[(i+1)/2-1]) {
                 cell = row.insertCell();
@@ -172,15 +222,23 @@ function createResultTable(values) {
                 ],
             }
             
-            for (let i = 1; i <= 3; i++) {
+            
+            // let j = i;
+            // console.log(i);
+            
+            for (let j = 1; j <= 3; j++) {
                 cell = row.insertCell();
-                cell.innerHTML = checkConst(delta, i);
+                cell.innerHTML = checkConst(delta, j);
                 cells_.push(cell);
             }
+            
+            // console.log(i);
             
             cell = row.insertCell();
             cell.innerHTML = nameOfProcess(delta);
             cells_.push(cell);
+            
+            checkTransition(delta, i / 2 - 1);
         }
         
         cells.push(cells_);
@@ -188,8 +246,30 @@ function createResultTable(values) {
     
     //document.getElementById("result").removeChild("table");
     //if (oldTable) {
-        //console.log(0, oldTable);
+    //console.log(0, oldTable);
+
     document.getElementById("result").replaceChildren(table);
+    document.getElementById("resultStatsOfTransition").innerHTML = "Обнаружен не изопроцесс => Q, КПД, графики не вычисляются, таблица показана как есть."
+
+    if (!isIsoprocess) {
+        const clearCan = id => {
+            let can = document.getElementById(id);
+            let ctx = can.getContext("2d");
+
+            ctx.clearRect(0, 0, can.width, can.height);
+        }
+
+        clearCan("cvs-pV");
+        clearCan("cvs-pT");
+        clearCan("cvs-VT");
+        
+        isIsoprocess = true;
+        return;
+    }
+    
+    plotGraphics(maxValues.p, maxValues.V, maxValues.T);
+
+    document.getElementById("resultStatsOfTransition").innerHTML = checkKPD();
         //table.id = "oldTable";
         //console.log(1, oldTable);
     //} else {
@@ -244,8 +324,7 @@ function checkConst(values, param) {
             } else {
                 return`↑ в ${p[1] / p[0]} р.`;
             }
-            
-            break;
+
         case 2: // V
             if (V[0] == V[1]) {
                 return "const";
@@ -254,8 +333,7 @@ function checkConst(values, param) {
             } else {
                 return `↑ в ${V[1] / V[0]} р.`;
             }
-            
-            break;
+
         default: // T
             if (T[0] == T[1]) {
                 return "const";
@@ -264,8 +342,6 @@ function checkConst(values, param) {
             } else {
                 return `↑ в ${T[1] / T[0]} р.`;
             }
-            
-            break;
     }
 }
 
@@ -282,8 +358,104 @@ function nameOfProcess(values) {
         case T[0] == T[1] && p[0] != p[1] && V[0] != V[1]:
             return "Изотермический<br>pV = const";
         default:
+            isIsoprocess = false;
             return "[Не удалось опрелелить]<br>pV ~ T";
     }
+}
+
+/**
+ * 
+ * @param {*} dValues delta values
+ * @param {number} numOfTransition Номер перехода
+ */
+function checkTransition(dValues, numOfTransition) {
+    numOfTransition = (numOfTransition + 1) / 10;
+
+    let p = dValues.p;
+    let V = dValues.V;
+    let T = dValues.T;
+    let dU, A;
+    
+    switch (true) {
+        case p[0] == p[1] && V[0] != V[1] && T[0] != T[1]:
+            let dV = V[1] - V[0];
+
+            dU = 3 / 2 * p[0] * dV;
+            A = p[0] * dV;
+
+            // points[numOfTransition].dU = dU;
+            // points[numOfTransition].A = A;
+            // points[numOfTransition].Q = dU + A;
+            // return "Изобарный<br>V/T = const";
+            break;
+        case V[0] == V[1] && p[0] != p[1] && T[0] != T[1]:
+            let dp = p[1] - p[0];
+
+            dU = 3 / 2 * V[0] * dp;
+            A = 0;
+            // return "Изохорный<br>p/T = const";
+            break;
+        case T[0] == T[1] && p[0] != p[1] && V[0] != V[1]:
+            dU = 0;
+            A = nu * R * T[0] * Math.log(p[0] / p[1]);
+            // return "Изотермический<br>pV = const";
+            break;
+        default:
+            dU = 0;
+            A = 0;
+            // return "[Не удалось опрелелить]<br>pV ~ T";
+            break;
+    }
+
+    points[numOfTransition].use = 1;
+    points[numOfTransition].dU = dU;
+    points[numOfTransition].A = A;
+    points[numOfTransition].Q = dU + A;
+
+    // console.log(points[numOfTransition]);
+
+    // checkKPD();
+}
+
+function checkKPD() {
+    let Qh = 0;
+    let Qc = 0;
+
+    let Th = points[1].T; // max
+    let Tc = points[1].T; // min
+
+    for (let i = 1; i <= numOfPoints; i++) {
+        let j = i / 10;
+
+        // console.log(points[j]);
+        let Q = points[j].Q;
+
+        if (Q > 0) {
+            Qh += Q;
+        } else {
+            Qc -= Math.abs(Q);
+        }
+    }
+
+    for (let i = 2; i <= numOfPoints; i++) {
+        let T = points[i].T;
+
+        Th = Math.max(Th, T);
+        Tc = Math.min(Tc, T);
+    }
+
+    let KPD = ( Qh - Math.abs(Qc) ) / Qh;
+    let KPDmax = ( Th - Tc ) / Th;
+
+    return (
+        `Q<sub>н</sub> = ${Qh.toFixed(1)} Дж<br>
+        Q<sub>х</sub> = ${Qc.toFixed(1)} Дж<br>
+        A<sub>п</sub> = ${( Qh - Math.abs(Qc) ).toFixed(1)} Дж <br>
+        &#951; = ${KPD.toFixed(3)} = ${( KPD * 100 ).toFixed(1)} %<br>
+        T<sub>н</sub> = ${Th.toFixed(1)} К<br>
+        T<sub>х</sub> = ${Tc.toFixed(1)} К<br>
+        &#951;<sub>max</sub> = ${KPDmax.toFixed(3)} = ${( KPDmax * 100 ).toFixed(1)} %`
+    );
 }
 
 function numberToExponent(num) {
@@ -312,22 +484,31 @@ function numberToExponent(num) {
 const exponentaToString = (m, e) =>
     e <= 2 && e >= -2 || m == 0 ? `${Math.round(m * Math.pow(10, e))}` : `${m.toString().replaceAll(".", ",")} * 10^${e}`;
 
-function plotGraphics() {
-    graphicPV();
-    graphicPT();
-    graphicVT();
+function plotGraphics(pMax, VMax, TMax) {
+    graphicPV( { x: VMax, y: pMax } );
+    graphicPT( { x: TMax, y: pMax } );
+    graphicVT( { x: TMax, y: VMax } );
 }
 
-function drawSystemOfCoordinates(cvs, textX="x", textY="y") {
+/**
+ * draw system of coordinates
+ * @param {HTMLCanvasElement} cvs canvas
+ * @param {number} scale scale
+ * @param {string} textX text of x
+ * @param {string} textY text of y
+ */
+function drawSystemOfCoordinates(cvs, scale, textX="x", textY="y", expX=0, expY=0) {
+    // console.log(scale);
+
     const ctx = cvs.getContext("2d");
     
     const w = cvs.clientWidth;
     const h = cvs.clientHeight;
     // console.log(w, h);
-    const centerX = w / 2;
-    const centerY = h / 2;
-    const scale = 26;
-    const gridStep = scale / 2;
+    // const centerX = w / 2;
+    // const centerY = h / 2;
+    // const scale = 26;
+    const gridStep = safeArea / 20;
     
     ctx.save();
     
@@ -394,8 +575,8 @@ function drawSystemOfCoordinates(cvs, textX="x", textY="y") {
     
     let fontH = getWidth("M");
     
-    ctx.fillText(textX, w - getWidth(textX) * 1.25, h - 20 + 5 + fontH);
-    ctx.fillText(textY, 20 + 5, fontH + 5);
+    ctx.fillText(`${textX} x 10^${expX}`, w - getWidth(`${textX} x 10^${expX}`) - 6, h - 20 - fontH); // + 5 + h
+    ctx.fillText(`${textY} x 10^${expY}`, 20 + 5, fontH + 5);
     
     // Нуль
     // let widthOfZero = (ctx.measureText("0")).width;
@@ -405,11 +586,20 @@ function drawSystemOfCoordinates(cvs, textX="x", textY="y") {
     //console.log(w - Math.ceil(ctx.measureText(textX).width * 1.25));
     // x
     // 26 - scale
-    for (let x = 0; x + 26 < w - getWidth(textX) * 1.25; x += 26) {
+    for (let x = 0; x + gridStep * 2 < w - /*getWidth(`${textX} x 10^${expX}`) * 1.25*/ 20; x += gridStep * 2) {
         //console.log(x);
-        if (x / 26 != 0) {
+        if (x !== 0) {
 	        const canvasX = 20 + x;
-	        ctx.fillText(x / 26, canvasX - getWidth(x / 26) / 2, h - 20 + 5 + fontH);
+            const valueOfX = Math.round(x / scale.x / Math.pow(10, expX) * 10) / 10;
+
+	        ctx.fillText(
+                valueOfX,
+                canvasX - ( valueOfX < 20 ? getWidth(valueOfX) : 20 ) / 2,
+                h - 20 + 5 + fontH,
+                20
+            );
+
+            console.log(valueOfX);
 	        
 	        ctx.beginPath();
 	        
@@ -418,15 +608,22 @@ function drawSystemOfCoordinates(cvs, textX="x", textY="y") {
 	        
 	        ctx.stroke();
 	    }
-	    
-	    //console.log(x/constScale, x, width/2 + constScale);
 	}
 	
 	// y
-	for (let y = 0; y + 26 < h - fontH * 1.5; y += 26) {
-		if (y / 26 != 0) {
+	for (let y = 0; y + gridStep * 2 < h - fontH * 1.5; y += gridStep * 2) {
+		if (y !== 0) {
 			const canvasY = h - 20 - y;
-			ctx.fillText(y / 26, 20 - getWidth(y / 26) - 5, canvasY + fontH / 2 - 2);
+            const valueOfY = Math.round(y / scale.y / Math.pow(10, expY) * 10) / 10;
+
+			ctx.fillText(
+                valueOfY,
+                ( 17 - ( getWidth(valueOfY) < 14 ? getWidth(valueOfY) : 14 ) ) / 2,
+                canvasY + fontH / 2 - 2,
+                14
+            );
+
+            console.log(valueOfY);
 			
 			ctx.beginPath();
 			
@@ -440,13 +637,28 @@ function drawSystemOfCoordinates(cvs, textX="x", textY="y") {
 	ctx.restore();
 }
 
-function graphicPV() {
+function graphicPV(maxValues) {
     const cvs = document.getElementById("cvs-pV");
     const ctx = cvs.getContext("2d");
+
+    let k = [
+        safeArea / maxValues.x,
+        safeArea / maxValues.y
+    ]
+
+    const scale = {
+        x: k[0] < 1 ? k[0] : Math.floor(k[0]),
+        y: k[1] < 1 ? k[1] : Math.floor(k[1]),
+    }
+
+    const exponentX = numberToExponent(maxValues.x);
+    const exponentY = numberToExponent(maxValues.y);
+
+    // console.log(exponentX, exponentY);
     
     // drawLine(cvs, ctx, 0, 0, 100, 100);
     
-    drawSystemOfCoordinates(cvs, "V, м³", "p, Па");
+    drawSystemOfCoordinates(cvs, scale, "V, м³", "p, Па", exponentX[1], exponentY[1]);
     
     let coords = {};
     
@@ -461,9 +673,9 @@ function graphicPV() {
         //console.log(points[i+1].V, points[t].p);
         if (points[i]["T"] == points[t]["T"]){
             //console.log(coords[i-1], coords[t]);
-            drawHyperbola(cvs, ctx, 26, coords[i-1][0], coords[i-1][1], coords[t-1][0], coords[t-1][1]);
+            drawHyperbola(cvs, ctx, scale, coords[i-1][0], coords[i-1][1], coords[t-1][0], coords[t-1][1]);
         } else {
-            drawLine(cvs, ctx, "red", [coords[i-1], coords[t-1]]);
+            drawLine(cvs, ctx, scale, "red", [coords[i-1], coords[t-1]]);
         }
     }
     
@@ -485,11 +697,25 @@ function graphicPV() {
     });*/
 }
 
-function graphicPT() {
+function graphicPT(maxValues) {
     const cvs = document.getElementById("cvs-pT");
     const ctx = cvs.getContext("2d");
+
+    // const scale = Math.floor(260 / maxValue);
+    let k = [
+        safeArea / maxValues.x,
+        safeArea / maxValues.y
+    ]
+
+    const scale = {
+        x: k[0] < 1 ? k[0] : Math.floor(k[0]),
+        y: k[1] < 1 ? k[1] : Math.floor(k[1]),
+    }
+
+    const exponentX = numberToExponent(maxValues.x);
+    const exponentY = numberToExponent(maxValues.y);
     
-    drawSystemOfCoordinates(cvs, "T, К", "p, Па");
+    drawSystemOfCoordinates(cvs, scale, "T, К", "p, Па", exponentX[1], exponentY[1]);
     
     let coords = {};
     
@@ -498,14 +724,27 @@ function graphicPT() {
         coords[i - 1] = [points[i]["T"], points[i]["p"]];
     }
     
-    drawLine(cvs, ctx, "green", coords);
+    drawLine(cvs, ctx, scale, "green", coords);
 }
 
-function graphicVT() {
+function graphicVT(maxValues) {
     const cvs = document.getElementById("cvs-VT");
     const ctx = cvs.getContext("2d");
+
+    let k = [
+        safeArea / maxValues.x,
+        safeArea / maxValues.y
+    ]
+
+    const scale = {
+        x: k[0] < 1 ? k[0] : Math.floor(k[0]),
+        y: k[1] < 1 ? k[1] : Math.floor(k[1]),
+    }
+
+    const exponentX = numberToExponent(maxValues.x);
+    const exponentY = numberToExponent(maxValues.y);
     
-    drawSystemOfCoordinates(cvs, "T, К", "V, м³");
+    drawSystemOfCoordinates(cvs, scale, "T, К", "V, м³", exponentX[1], exponentY[1]);
     
     let coords = {};
     
@@ -514,17 +753,17 @@ function graphicVT() {
         coords[i - 1] = [points[i]["T"], points[i]["V"]];
     }
     
-    drawLine(cvs, ctx, "blue", coords);
+    drawLine(cvs, ctx, scale, "blue", coords);
 }
 
-function drawLine(cvs, ctx, color, coords) {
+function drawLine(cvs, ctx, scale, color, coords) {
     let w = cvs.clientWidth;
     let h = cvs.clientHeight;
     
-    let x0 = (w - 20) / 2;
-    let y0 = (h - 20) / 2;
+    // let x0 = (w - 20) / 2;
+    // let y0 = (h - 20) / 2;
     
-    let scale = 26;
+    // let scale = 26;
     
     //ctx.fillRect(1*scale+w/2,1*scale+h/2,10,10);
     
@@ -537,7 +776,11 @@ function drawLine(cvs, ctx, color, coords) {
     //console.log(coords);
     //ctx.moveTo(0,0)
     
-    let coords0 = convertToCanvasCoords(coords[0][0] * scale, coords[0][1] * scale, w, h);
+    let coords0 = convertToCanvasCoords(
+        coords[0][0] * scale.x,
+        coords[0][1] * scale.y,
+        w, h
+    );
     
     ctx.moveTo(coords0[0], coords0[1]);
     //ctx.fillText("1", coords0[0] + 30, coords0[1]);
@@ -547,13 +790,18 @@ function drawLine(cvs, ctx, color, coords) {
     if (coords[0][1] % 1 == 0)
         ctx.fillText(coords[0][1], 10 + 20, 10 + coords[0][1] * scale + 5);*/
     for (i in coords) {
-        let coords_ = convertToCanvasCoords(coords[i][0] * scale, coords[i][1] * scale, w, h);
+        let coords_ = convertToCanvasCoords(
+            coords[i][0] * scale.x,
+            coords[i][1] * scale.y,
+            w, h
+        );
         let x = coords_[0];
         let y = coords_[1];
         
         ctx.lineTo(x, y);
         //console.log(x,y)
     }
+
     ctx.lineTo(coords0[0], coords0[1]);
     
     ctx.strokeStyle = color;
@@ -574,8 +822,8 @@ function drawHyperbola(cvs, ctx, scale, x0, y0, xk, yk) {
     const w = cvs.clientWidth;
     const h = cvs.clientHeight;
     
-    let coords0 = convertToCanvasCoords(x0 * scale, y0 * scale, w, h);
-    let coordsK = convertToCanvasCoords(xk * scale, yk * scale, w, h);
+    let coords0 = convertToCanvasCoords(x0 * scale.x, y0 * scale.y, w, h);
+    let coordsK = convertToCanvasCoords(xk * scale.x, yk * scale.y, w, h);
     
     k = x0 * y0;
     
@@ -591,14 +839,18 @@ function drawHyperbola(cvs, ctx, scale, x0, y0, xk, yk) {
     ctx.strokeStyle = "red";
     
     //console.log(x0, xk)
+    let iterator = (xk - x0) / 20;
     
-    for (let x = x0; x0 < xk ? x <= xk : x >= xk; x += x0 < xk ? 1 / 16 : -1 / 16) {
-        if (x != 0) {
+    for (
+        let x = x0;
+        x0 < xk ? x <= xk : x >= xk;
+        x += iterator) {
+        if (x !== 0) {
             y = k / x;
             
             //console.log(scale)
             
-            let coords_ = convertToCanvasCoords(x * scale, y * scale, w, h)
+            let coords_ = convertToCanvasCoords(x * scale.x, y * scale.y, w, h)
             
             ctx.lineTo(coords_[0], coords_[1]);
             
