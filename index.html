@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles/main.css">
   <script src="scripts/main.js"></script>
-  <title>Изопроцессы v0.1</title>
+  <title>Изопроцессы v0.2</title>
 </head>
 <body>
-    <h1 id="header">Изопроцессы [0.1]</h1>
+    <h1 id="header">Изопроцессы [0.2]</h1>
     <p id="step1Elem" style="margin-top: 5px;">
         <label for="typeOfGraphic">
             Какой дан график?
@@ -44,20 +44,23 @@
             <!-- <option value="1">
                 1
             </option> -->
-            <option value="2">
+            <!-- <option value="2">
                 2
-            </option>
+            </option> -->
             <option value="3">
                 3
             </option>
             <option value="4">
                 4
             </option>
+            <option value="5">
+                5
+            </option>
         </select>
     </p>
     
     <div id="step3Elem" style="display: none;">
-        <p>Какие координаты у этих точек?</p>
+        <p>Какие координаты у этих точек? (<i>Учитывая множитель оси!</i>)</p>
         <ul>
         <li id="1Point">
             <b>1 Точка:</b>
@@ -178,6 +181,36 @@
                 </tr>
             </table>
         </li>
+
+        <li id="5Point">
+            <b>5 Точка:</b>
+            <table id="5PointTable">
+                <tr>
+                    <td>
+                        <label for="1Label5Point" id="1Label5PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="1Label5Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="2Label5Point" id="2Label5PointLabel">
+                            X:
+                        </label>
+                    </td>
+                    <td>
+                        <input type="number"
+                            id="2Label5Point"
+                            placeholder="1">
+                    </td>
+                </tr>
+            </table>
+        </li>
         </ul>
         
         <button onclick="submit()">
@@ -188,6 +221,7 @@
     <div id="resultWindow" style="display: none;">
         <h3 style="padding: 5px">Результат:</h3>
         <div id="result" style="padding: 5px;"></div>
+        <div id="resultStatsOfTransition" style="padding: 5px;"></div>
         <canvas id="cvs-pV" width="300" height="300"></canvas>
         <canvas id="cvs-pT" width="300" height="300"></canvas>
         <canvas id="cvs-VT" width="300" height="300"></canvas>
