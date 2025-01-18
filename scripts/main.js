@@ -187,7 +187,7 @@ function createResultTable(values, maxValues) {
             cell.innerHTML = `Точка ${(i+1)/2}`;
             cells_.push(cell);
             
-            console.log((i+1)/2-1, values[(i+1)/2-1]);
+            // console.log((i+1)/2-1, values[(i+1)/2-1]);
             
             for (j in values[(i+1)/2-1]) {
                 cell = row.insertCell();
@@ -249,7 +249,6 @@ function createResultTable(values, maxValues) {
     //console.log(0, oldTable);
 
     document.getElementById("result").replaceChildren(table);
-    document.getElementById("resultStatsOfTransition").innerHTML = "Обнаружен не изопроцесс => Q, КПД, графики не вычисляются, таблица показана как есть."
 
     if (!isIsoprocess) {
         const clearCan = id => {
@@ -262,14 +261,24 @@ function createResultTable(values, maxValues) {
         clearCan("cvs-pV");
         clearCan("cvs-pT");
         clearCan("cvs-VT");
+
+        // document.getElementById("resultStatsOfTransition").style.display = "block";
+        document.getElementById("resultStatsOfTransition").innerHTML =
+            `Обнаружен не изопроцесс &rArr; графики не вычисляются, 
+            таблица показана как есть.`;
         
         isIsoprocess = true;
         return;
+    } else {
+        // document.getElementById("resultStatsOfTransition").style.display = "none";
+        document.getElementById("resultStatsOfTransition").innerHTML =
+            `Ошибок не возникло.`;
     }
     
     plotGraphics(maxValues.p, maxValues.V, maxValues.T);
 
-    document.getElementById("resultStatsOfTransition").innerHTML = checkKPD();
+    // document.getElementById("resultStatsOfTransition").innerHTML = checkKPD();
+
         //table.id = "oldTable";
         //console.log(1, oldTable);
     //} else {
@@ -320,27 +329,27 @@ function checkConst(values, param) {
             if (p[0] == p[1]) {
                 return "const";
             } else if (p[0] > p[1]) {
-                return `↓ в ${p[0] / p[1]} р.`;
+                return `↓ в ${(p[0] / p[1]).toFixed(1)} р.`;
             } else {
-                return`↑ в ${p[1] / p[0]} р.`;
+                return`↑ в ${(p[1] / p[0]).toFixed(1)} р.`;
             }
 
         case 2: // V
             if (V[0] == V[1]) {
                 return "const";
             } else if (V[0] > V[1]) {
-                return `↓ в ${V[0] / V[1]} р.`;
+                return `↓ в ${(V[0] / V[1]).toFixed(1)} р.`;
             } else {
-                return `↑ в ${V[1] / V[0]} р.`;
+                return `↑ в ${(V[1] / V[0]).toFixed(1)} р.`;
             }
 
         default: // T
             if (T[0] == T[1]) {
                 return "const";
             } else if (T[0] > T[1]) {
-                return `↓ в ${T[0] / T[1]} р.`;
+                return `↓ в ${(T[0] / T[1]).toFixed(1)} р.`;
             } else {
-                return `↑ в ${T[1] / T[0]} р.`;
+                return `↑ в ${(T[1] / T[0]).toFixed(1)} р.`;
             }
     }
 }
@@ -359,14 +368,14 @@ function nameOfProcess(values) {
             return "Изотермический<br>pV = const";
         default:
             isIsoprocess = false;
-            return "[Не удалось опрелелить]<br>pV ~ T";
+            return "[Не определён]<br>pV ~ T";
     }
 }
 
-/**
+/**delta values
+ * @param {number} num
  * 
- * @param {*} dValues delta values
- * @param {number} numOfTransition Номер перехода
+ * @param {*} dValues OfTransition Номер перехода
  */
 function checkTransition(dValues, numOfTransition) {
     numOfTransition = (numOfTransition + 1) / 10;
@@ -574,9 +583,16 @@ function drawSystemOfCoordinates(cvs, scale, textX="x", textY="y", expX=0, expY=
     let getWidth = text => Math.ceil(ctx.measureText(text).width);
     
     let fontH = getWidth("M");
+
+    let textOfXFinal = textX;
+    let textOfYFinal = textY;
+
+    if (expX < -1 || expX > 2) textOfXFinal = `${textX} × 10^${expX}`;
+
+    if (expY < -1 || expY > 2) textOfYFinal = `${textY} × 10^${expY}`;
     
-    ctx.fillText(`${textX} x 10^${expX}`, w - getWidth(`${textX} x 10^${expX}`) - 6, h - 20 - fontH); // + 5 + h
-    ctx.fillText(`${textY} x 10^${expY}`, 20 + 5, fontH + 5);
+    ctx.fillText(textOfXFinal, w - getWidth(textOfXFinal) - 6, h - 20 - fontH); // + 5 + h
+    ctx.fillText(textOfYFinal, 20 + 5, fontH + 5);
     
     // Нуль
     // let widthOfZero = (ctx.measureText("0")).width;
@@ -590,7 +606,13 @@ function drawSystemOfCoordinates(cvs, scale, textX="x", textY="y", expX=0, expY=
         //console.log(x);
         if (x !== 0) {
 	        const canvasX = 20 + x;
-            const valueOfX = Math.round(x / scale.x / Math.pow(10, expX) * 10) / 10;
+            let valueOfX;
+
+            if (expX < -1 || expX > 2) {
+                valueOfX = Math.round(x / scale.x / Math.pow(10, expX) * 10) / 10;
+            } else {
+                valueOfX = Math.round(x / scale.x * 10) / 10;
+            }
 
 	        ctx.fillText(
                 valueOfX,
@@ -599,7 +621,7 @@ function drawSystemOfCoordinates(cvs, scale, textX="x", textY="y", expX=0, expY=
                 20
             );
 
-            console.log(valueOfX);
+            // console.log(valueOfX);
 	        
 	        ctx.beginPath();
 	        
@@ -614,7 +636,12 @@ function drawSystemOfCoordinates(cvs, scale, textX="x", textY="y", expX=0, expY=
 	for (let y = 0; y + gridStep * 2 < h - fontH * 1.5; y += gridStep * 2) {
 		if (y !== 0) {
 			const canvasY = h - 20 - y;
-            const valueOfY = Math.round(y / scale.y / Math.pow(10, expY) * 10) / 10;
+            let valueOfY;
+            if (expY < -1 || expY > 2) {
+                valueOfY = Math.round(y / scale.y / Math.pow(10, expY) * 10) / 10;
+            } else {
+                valueOfY = Math.round(y / scale.y * 10) / 10;
+            }
 
 			ctx.fillText(
                 valueOfY,
@@ -623,7 +650,7 @@ function drawSystemOfCoordinates(cvs, scale, textX="x", textY="y", expX=0, expY=
                 14
             );
 
-            console.log(valueOfY);
+            // console.log(valueOfY);
 			
 			ctx.beginPath();
 			
@@ -644,12 +671,20 @@ function graphicPV(maxValues) {
     let k = [
         safeArea / maxValues.x,
         safeArea / maxValues.y
-    ]
+    ];
 
-    const scale = {
+    const scale_def = {
         x: k[0] < 1 ? k[0] : Math.floor(k[0]),
         y: k[1] < 1 ? k[1] : Math.floor(k[1]),
-    }
+    };
+
+    // let koef_scale_sc = numOfPoints !== 2 ? 1 : 0.5;
+
+    // const scale_sc = {
+    //     x: k[0] < 1 ? k[0] * koef_scale_sc : Math.floor(k[0] * koef_scale_sc),
+    //     y: k[1] < 1 ? k[1] * koef_scale_sc : Math.floor(k[1] * koef_scale_sc),
+    // };
+    
 
     const exponentX = numberToExponent(maxValues.x);
     const exponentY = numberToExponent(maxValues.y);
@@ -658,7 +693,7 @@ function graphicPV(maxValues) {
     
     // drawLine(cvs, ctx, 0, 0, 100, 100);
     
-    drawSystemOfCoordinates(cvs, scale, "V, м³", "p, Па", exponentX[1], exponentY[1]);
+    drawSystemOfCoordinates(cvs, scale_def, "V, м³", "p, Па", exponentX[1], exponentY[1]);
     
     let coords = {};
     
@@ -673,9 +708,9 @@ function graphicPV(maxValues) {
         //console.log(points[i+1].V, points[t].p);
         if (points[i]["T"] == points[t]["T"]){
             //console.log(coords[i-1], coords[t]);
-            drawHyperbola(cvs, ctx, scale, coords[i-1][0], coords[i-1][1], coords[t-1][0], coords[t-1][1]);
+            drawHyperbola(cvs, ctx, scale_def, coords[i-1][0], coords[i-1][1], coords[t-1][0], coords[t-1][1]);
         } else {
-            drawLine(cvs, ctx, scale, "red", [coords[i-1], coords[t-1]]);
+            drawLine(cvs, ctx, scale_def, "red", [coords[i-1], coords[t-1]]);
         }
     }
     
@@ -705,12 +740,28 @@ function graphicPT(maxValues) {
     let k = [
         safeArea / maxValues.x,
         safeArea / maxValues.y
-    ]
+    ];
+
+    let koef_scale = numOfPoints !== 2 ? 1 : 1;
 
     const scale = {
-        x: k[0] < 1 ? k[0] : Math.floor(k[0]),
-        y: k[1] < 1 ? k[1] : Math.floor(k[1]),
-    }
+        x: k[0] < 1 ? k[0] * koef_scale : Math.floor(k[0] * koef_scale),
+        y: k[1] < 1 ? k[1] * koef_scale : Math.floor(k[1] * koef_scale),
+    };
+
+    // if (scaleK === 1) {
+    //     let rangeEl = document.getElementById("range-pT");
+
+    //     rangeEl.min = (scale.x + scale.y) / 20;
+    //     rangeEl.step = (scale.x + scale.y) / 4;
+    //     rangeEl.max = (scale.x + scale.y) * 5;
+    //     rangeEl.value = (scale.x + scale.y) / 2;
+
+    //     rangeEl.addEventListener("change", () => {
+    //         graphicPT(maxValues, this.value);
+    //         console.log(this.value);
+    //     });
+    // }
 
     const exponentX = numberToExponent(maxValues.x);
     const exponentY = numberToExponent(maxValues.y);
@@ -734,12 +785,19 @@ function graphicVT(maxValues) {
     let k = [
         safeArea / maxValues.x,
         safeArea / maxValues.y
-    ]
+    ];
+
+    let koef_scale = numOfPoints !== 2 ? 1 : 1;
 
     const scale = {
-        x: k[0] < 1 ? k[0] : Math.floor(k[0]),
-        y: k[1] < 1 ? k[1] : Math.floor(k[1]),
-    }
+        x: k[0] < 1 ? k[0] * koef_scale : Math.floor(k[0] * koef_scale),
+        y: k[1] < 1 ? k[1] * koef_scale : Math.floor(k[1] * koef_scale),
+    };
+
+    // const scale = {
+    //     x: k[0] < 1 ? k[0] : Math.floor(k[0]),
+    //     y: k[1] < 1 ? k[1] : Math.floor(k[1]),
+    // }
 
     const exponentX = numberToExponent(maxValues.x);
     const exponentY = numberToExponent(maxValues.y);
@@ -884,6 +942,3 @@ function convertToPrimeCoords(x, y, W, H) {
     const yPrime = H - 20 - y;
     return [ xPrime, yPrime ];
 }
-
-//console.log(convertToCanvasCoords(0, 0, 300, 300));
-//console.log(convertToPrimeCoords(20, 280, 300, 300))
