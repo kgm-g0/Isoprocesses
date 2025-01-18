@@ -1,231 +1,232 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles/main.css">
-  <script src="scripts/main.js"></script>
-  <title>Изопроцессы v0.2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="scripts/main.js"></script>
+    <title>Изопроцессы</title>
 </head>
+
 <body>
-    <h1 id="header">Изопроцессы [0.2]</h1>
-    <p id="step1Elem" style="margin-top: 5px;">
-        <label for="typeOfGraphic">
-            Какой дан график?
-        </label>
-        <select id="typeOfGraphic"
-            onchange="step1(this)">
-            <option value="0"
-                selected disabled>
-                -
-            </option>
-            <option value="1">
-                p(V)
-            </option>
-            <option value="2">
-                p(T)
-            </option>
-            <option value="3">
-                V(T)
-            </option>
-        </select>
-    </p>
-    
-    <p id="step2Elem" style="display: none;">
-        <label for="numOfPoints">
-            Сколько точек на графике?
-        </label>
-        <select id="numOfPoints"
-            onchange="step2(this)">
-            <option value="0"
-                selected disabled>
-                -
-            </option>
-            <!-- <option value="1">
+    <section id="mainWindow">
+        <h1 id="header">Изопроцессы</h1>
+        <p id="step1Elem" style="margin-top: 5px;">
+            <label for="typeOfGraphic">
+                Какой дан график?
+            </label>
+            <select id="typeOfGraphic" onchange="step1(this)">
+                <option value="0" selected disabled>
+                    -
+                </option>
+                <option value="1">
+                    p(V)
+                </option>
+                <option value="2">
+                    p(T)
+                </option>
+                <option value="3">
+                    V(T)
+                </option>
+            </select>
+        </p>
+
+        <p id="step2Elem" style="display: none;">
+            <label for="numOfPoints">
+                Сколько точек на графике?
+            </label>
+            <select id="numOfPoints" onchange="step2(this)">
+                <option value="0" selected disabled>
+                    -
+                </option>
+                <!-- <option value="1">
                 1
             </option> -->
-            <!-- <option value="2">
-                2
-            </option> -->
-            <option value="3">
-                3
-            </option>
-            <option value="4">
-                4
-            </option>
-            <option value="5">
-                5
-            </option>
-        </select>
-    </p>
-    
-    <div id="step3Elem" style="display: none;">
-        <p>Какие координаты у этих точек? (<i>Учитывая множитель оси!</i>)</p>
-        <ul>
-        <li id="1Point">
-            <b>1 Точка:</b>
-            <table id="1PointTable">
-                <tr>
-                    <td>
-                        <label for="1Label1Point" id="1Label1PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="1Label1Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="2Label1Point" id="2Label1PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="2Label1Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-            </table>
-        </li>
-        
-        <li id="2Point">
-            <b>2 Точка:</b>
-            <table id="2PointTable">
-                <tr>
-                    <td>
-                        <label for="1Label2Point" id="1Label2PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="1Label2Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="2Label2Point" id="2Label2PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="2Label2Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-            </table>
-        </li>
-        
-        <li id="3Point">
-            <b>3 Точка:</b>
-            <table id="3PointTable">
-                <tr>
-                    <td>
-                        <label for="1Label3Point" id="1Label3PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="1Label3Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="2Label3Point" id="2Label3PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="2Label3Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-            </table>
-        </li>
-        
-        <li id="4Point">
-            <b>4 Точка:</b>
-            <table id="4PointTable">
-                <tr>
-                    <td>
-                        <label for="1Label4Point" id="1Label4PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="1Label4Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="2Label4Point" id="2Label4PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="2Label4Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-            </table>
-        </li>
+                <option value="2">
+                    2
+                </option>
+                <option value="3">
+                    3
+                </option>
+                <option value="4">
+                    4
+                </option>
+                <option value="5">
+                    5
+                </option>
+            </select>
+        </p>
 
-        <li id="5Point">
-            <b>5 Точка:</b>
-            <table id="5PointTable">
-                <tr>
-                    <td>
-                        <label for="1Label5Point" id="1Label5PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="1Label5Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="2Label5Point" id="2Label5PointLabel">
-                            X:
-                        </label>
-                    </td>
-                    <td>
-                        <input type="number"
-                            id="2Label5Point"
-                            placeholder="1">
-                    </td>
-                </tr>
-            </table>
-        </li>
-        </ul>
-        
-        <button onclick="submit()">
-            Посчитать
-        </button>
-    </div>
-    
-    <div id="resultWindow" style="display: none;">
-        <h3 style="padding: 5px">Результат:</h3>
-        <div id="result" style="padding: 5px;"></div>
-        <div id="resultStatsOfTransition" style="padding: 5px;"></div>
-        <canvas id="cvs-pV" width="300" height="300"></canvas>
-        <canvas id="cvs-pT" width="300" height="300"></canvas>
-        <canvas id="cvs-VT" width="300" height="300"></canvas>
-        <!-- <table id="resultTable">
+        <div id="step3Elem" style="display: none;">
+            <p>Какие координаты у этих точек?<br>(<i>Учитывая множитель оси!</i>)</p>
+            <ul>
+                <li id="1Point">
+                    <b>1 Точка:</b>
+                    <table id="1PointTable">
+                        <tr>
+                            <td>
+                                <label for="1Label1Point" id="1Label1PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="1Label1Point" placeholder="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="2Label1Point" id="2Label1PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="2Label1Point" placeholder="1">
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+
+                <li id="2Point">
+                    <b>2 Точка:</b>
+                    <table id="2PointTable">
+                        <tr>
+                            <td>
+                                <label for="1Label2Point" id="1Label2PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="1Label2Point" placeholder="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="2Label2Point" id="2Label2PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="2Label2Point" placeholder="1">
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+
+                <li id="3Point">
+                    <b>3 Точка:</b>
+                    <table id="3PointTable">
+                        <tr>
+                            <td>
+                                <label for="1Label3Point" id="1Label3PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="1Label3Point" placeholder="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="2Label3Point" id="2Label3PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="2Label3Point" placeholder="1">
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+
+                <li id="4Point">
+                    <b>4 Точка:</b>
+                    <table id="4PointTable">
+                        <tr>
+                            <td>
+                                <label for="1Label4Point" id="1Label4PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="1Label4Point" placeholder="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="2Label4Point" id="2Label4PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="2Label4Point" placeholder="1">
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+
+                <li id="5Point">
+                    <b>5 Точка:</b>
+                    <table id="5PointTable">
+                        <tr>
+                            <td>
+                                <label for="1Label5Point" id="1Label5PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="1Label5Point" placeholder="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="2Label5Point" id="2Label5PointLabel">
+                                    X:
+                                </label>
+                            </td>
+                            <td>
+                                <input type="number" id="2Label5Point" placeholder="1">
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+
+            <div style="text-align: center;">
+                <button onclick="submit()" class="submitButton">
+                Посчитать
+                </button>
+            </div>
+        </div>
+
+        <div id="resultWindow" style="display: none;">
+            <h3 style="padding: 5px">Результат:</h3>
+            <div id="result" style="padding: 5px;"></div>
+            <div id="resultStatsOfTransition" style="padding: 5px;"></div>
+            <canvas id="cvs-pV" width="300" height="300"></canvas>
+            <canvas id="cvs-pT" width="300" height="300"></canvas>
+            <canvas id="cvs-VT" width="300" height="300"></canvas>
+
+            <!-- <div id="scale-ranges">
+            <div>
+                <label for="range-pV">Scale p(V): 1</label>
+                <br>
+                <input id="range-pV" type="range" step="1" min="1" max="10" value="1">
+            </div>
+
+            <div>
+                <label for="range-pT">Scale p(T): 1</label>
+                <br>
+                <input id="range-pT" type="range" step="1" min="1" max="10" value="1">
+            </div>
+
+            <div>
+                <label for="range-VT">Scale V(T): 1</label>
+                <br>
+                <input id="range-VT" type="range" step="1" min="1" max="10" value="1">
+            </div>
+        </div> -->
+            <!-- <table id="resultTable">
             <tr>
                 <td>Переход, состояние</td>
                 <td>p, Па</td>
@@ -263,9 +264,16 @@
             </tr>
             
         </table> -->
-    </div>
-    <br>
-    
-	<footer>&copy; KGM, 2025</footer>
+        </div>
+    </section>
+
+    <span id="version">
+        Версия: 0.2.1 (3)
+    </span>
+
+    <footer>
+        &copy; KGM, 2025
+    </footer>
 </body>
+
 </html>
